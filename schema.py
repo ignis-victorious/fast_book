@@ -6,15 +6,19 @@ from pydantic import BaseModel
 #  ___________________
 
 
+class Book(BaseModel):
+    id: int
+    title: str
+    author: str
+    publisher: str
+    published_date: str
+    page_count: int
+    language: str
 
 
-class BookCreate(BaseModel) :
-    title : str 
-    author : str
-
-
-
-# {
-#     "title": "Learn Django",
-#     "author": "Elle Emagnu"
-# }
+class BookUpdate(Book):
+    title: str
+    author: str
+    publisher: str
+    page_count: int
+    language: str
