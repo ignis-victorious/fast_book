@@ -1,41 +1,41 @@
 #  ___________________
 #  Import  LIBRARIES
 from typing import Any
-from fastapi import FastAPI, Header, status
+from fastapi import APIRouter, Header, status
 from fastapi.exceptions import HTTPException
 
 #  Import FILES
-from book_db import books
-from schema import Book, BookUpdate
+from src.books.book_db import books
+from schemas import Book, BookUpdate
 #  OTHER
 #  https://restfox.dev/
-#  49.50
+#  1:23:45
 #  ___________________
 
 
-app = FastAPI()
+book_router = APIRouter()
 
 
-#  GET Web-Api Root
-@app.get("/")
-async def read_root() -> dict[str, str]:
-    return {"message": "Hello this is the root of books"}
+# #  GET Web-Api Root
+# @book_router.get("/")
+# async def read_root() -> dict[str, str]:
+#     return {"message": "Hello this is the root of books"}
 
 
-@app.get("/books")  # , response_model=list[Book])
+@book_router.get("/")  # , response_model=list[Book])
 async def get_all_books() -> list[dict[str, Any]]:  # -> list[Book]
     return books
 
 
 #   POST: CREATE a new book
-@app.post("/books", status_code=status.HTTP_201_CREATED)
+@book_router.post("/", status_code=status.HTTP_201_CREATED)
 async def create_a_book(book_data: Book) -> dict:
     new_book: dict[str, Any] = book_data.model_dump()
     books.append(new_book)
     return new_book
 
 
-@app.get("/book/{book_id}")
+@book_router.get("/{book_id}")
 async def get_book(book_id: int) -> dict:
     print("_____________i am in!")
     for book in books:
@@ -45,7 +45,7 @@ async def get_book(book_id: int) -> dict:
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Book not found!")
 
 
-@app.patch("/book/{book_id}")
+@book_router.patch("/{book_id}")
 async def update_book(book_id: int, book_update_data: BookUpdate) -> dict:
     for book in books:
         if book["id"] == book_id:
@@ -57,7 +57,7 @@ async def update_book(book_id: int, book_update_data: BookUpdate) -> dict:
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Book not found!")
 
 
-@app.delete("/book/{book_id}", status_code=status.HTTP_204_NO_CONTENT)
+@book_router.delete("/{book_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_book(book_id: int):
     for book in books:
         if book["id"] == book_id:
@@ -67,7 +67,7 @@ async def delete_book(book_id: int):
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Book not found!")
 
 
-@app.get("/get_headers", status_code=200)
+@book_router.get("/get_headers", status_code=200)
 async def get_headers(
     accept: str = Header(None),
     content_type: str = Header(None),
@@ -81,19 +81,3 @@ async def get_headers(
     request_headers["User-Agent"] = user_agent
     request_headers["Host"] = host
     return request_headers
-
-
-#
-#  ___________________
-#  Import  LIBRARIES
-#  Import FILES
-#  OTHERS
-#  ___________________
-
-
-# def main():
-#     print("Hello from fast-book!")
-
-
-# if __name__ == "__main__":
-#     main()
